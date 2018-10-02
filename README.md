@@ -28,7 +28,7 @@ This tool requires:
 First, install spidey-dance:
 
 ```
-git clone
+git clone https://github.com/whensbrunch/spidey-dance.git
 ```
 
 Next, set the following environment variables:
