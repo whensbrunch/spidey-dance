@@ -1,8 +1,3 @@
-ffmpeg
-Docker?
+<p align="center"><img width=12.5% src="https://github.com/whensbrunch/spidey-dance/blob/master/media/logo.jpg"></p>
+<p align="center"><img width=60% src="https://github.com/whensbrunch/spidey-dance/blob/master/media/.jpg"></p>
 
-export OPENPOSE_ROOT=path/to/openpose
-export IAM_KEY=path/to/iam_key
-
-sudo apt-get install imagemagick (convert)
-ffmpeg
