@@ -34,9 +34,16 @@ git clone https://github.com/whensbrunch/spidey-dance.git
 Next, set the following environment variables:
 
 ```
-export OPENPOSE_ROOT
-export IAM_KEY
-export PIX2PIXHD_DNS
-export PIX2PIXHD_ROOT
+export OPENPOSE_ROOT=path/to/openpose
+export IAM_KEY=path/to/keypair.pem 
+export PIX2PIXHD_DNS=ec2_dns
+export PIX2PIXHD_ROOT=path/to/pix2pixHD
 ```
+
+We will need two nodes: one to run OpenPose and one to run pix2pixHD. The CLI will run from the OpenPose node and so we will need to `ssh` into the node with pix2pixHD. For this we need the User and Public DNS (ex: ubuntu@ec2-xx-xxx-xxx-xxx.compute-1.amazonaws.com).
+
+You'll also need the `.pem` file to `ssh` into the pix2pixHD node. Set the path to this file as `IAM_KEY`.
+
+## Getting help
+
 
