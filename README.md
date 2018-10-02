@@ -3,7 +3,7 @@
 <p align="center"><img width=60% src="https://github.com/whensbrunch/spidey-dance/blob/master/media/Dont-Make-Me-Dance.png"></p>
 </h1>
 
-<h4 align="center">Deep learning for human motion transfer.</h4>
+<h3 align="center">Deep learning for human motion transfer.</h3>
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 ![Python](https://img.shields.io/badge/python-v3.6+-blue.svg)
