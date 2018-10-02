@@ -1,5 +1,5 @@
 <h1 align="center">
-<p align="center"><img width=50% src="https://github.com/whensbrunch/spidey-dance/blob/master/media/Logo.png"></p>
+<p align="center"><img width=30% src="https://github.com/whensbrunch/spidey-dance/blob/master/media/Logo.png"></p>
 <p align="center"><img width=60% src="https://github.com/whensbrunch/spidey-dance/blob/master/media/Dont-Make-Me-Dance.png"></p>
 </h1>
 
