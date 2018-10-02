@@ -11,3 +11,32 @@
 ![Contributions welcome](https://img.shields.io/badge/contributions-welcome-orange.svg)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
+## Basic Overview
+
+Using this command line tool, you can transfer movement from a source video onto an avatar of Spiderman. The pipeline is powered by deep learning models (specifically: generative adversial networks) in order to produce gifs of Spiderman in various poses. This work is based on the research paper "Everybody Dance Now".
+
+## Requirements
+
+This tool requires:
+
+* 2 AWS EC2 instances (with a GPU)
+* pix2pixHD
+* OpenPose
+
+## Usage
+
+First, install spidey-dance:
+
+```
+git clone
+```
+
+Next, set the following environment variables:
+
+```
+export OPENPOSE_ROOT
+export IAM_KEY
+export PIX2PIXHD_DNS
+export PIX2PIXHD_ROOT
+```
+
