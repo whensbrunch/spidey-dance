@@ -1,9 +1,9 @@
 <h1 align="center">
-<p align="center"><img width=12.5% src="https://github.com/whensbrunch/spidey-dance/blob/master/media/Logo.png"></p>
+<p align="center"><img width=50% src="https://github.com/whensbrunch/spidey-dance/blob/master/media/Logo.png"></p>
 <p align="center"><img width=60% src="https://github.com/whensbrunch/spidey-dance/blob/master/media/Dont-Make-Me-Dance.png"></p>
 </h1>
 
-<h4 align="center">A minimal Markdown Editor desktop app built on top of <a href="http://electron.atom.io" target="_blank">Electron</a>.</h4>
+<h4 align="center">Deep learning for human motion transfer.</h4>
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 ![Python](https://img.shields.io/badge/python-v3.6+-blue.svg)
