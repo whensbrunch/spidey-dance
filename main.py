@@ -56,6 +56,7 @@ def detect(video):
     ])
     click.echo('==> Done.')
 
+    # TODO: capture return code
     click.echo('Converting video back to MP4...')
     subprocess.run([
         'ffmpeg',
