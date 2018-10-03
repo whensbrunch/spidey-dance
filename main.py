@@ -8,23 +8,23 @@ import shutil
 import subprocess
 import time
 
-
-iam_key = os.environ['IAM_KEY']
-pix2pixhd_root = os.environ['PIX2PIXHD_ROOT']
-pix2pixhd_dns = os.environ['PIX2PIXHD_DNS']
+from config import cfg
  
 
 # utility functions
 def safe_mkdir(path):
+    """Make all directories in a path as necessary."""
     if not os.path.exists(path):
         os.makedirs(path)
     return None
 
 
 def get_base_name(path):
+    """Extract the filename with generic extension."""
     return path.split(os.sep)[-1].split('.')[0] + '.{}'
 
 
+# command line tool
 @click.group()
 def cli():
     pass
@@ -34,25 +34,30 @@ def cli():
 def detect(video):
     """Detect poses in video."""
     click.echo('Converting video to AVI...')
-    safe_mkdir('data/detect/input')
+    safe_mkdir(cfg.detect_input)
     base_name = get_base_name(video) 
     subprocess.run([
         'ffmpeg',
         '-i', video,
-        os.path.join('data', 'detect', 'input', base_name.format('avi'))
+        os.path.join(cfg.detect_input, base_name.format('avi'))
     ])
     click.echo('==> Done.')
 
     click.echo('Running pose detection using OpenPose...')
-    safe_mkdir('data/detect/output')
-    openpose_root = os.environ['OPENPOSE_ROOT']
+    safe_mkdir(cfg.detect_output)
+    openpose_binary = os.path.join(
+        cfg.openpose_root, 'build', 'examples', 'openpose', 'openpose.bin')
+    input = os.path.join(cfg.detect_input, base_name.format('avi'))
+    output = os.path.join(cfg.detect_output, base_name.format('avi'))
+    model_folder = os.path.join(cfg.openpose_root, 'models')
+
     subprocess.run([
-        os.path.join(openpose_root, 'build', 'examples', 'openpose', 'openpose.bin'),
-        '--video', os.path.join('.', 'data', 'detect', 'input', base_name.format('avi')),
-        '--write_video', os.path.join('.', 'data', 'detect', 'output', base_name.format('avi')),
+        openpose_binary,
+        '--video', input,
+        '--write_video', output,
         '--disable_blending',
         '--display', '0',
-        '--model_folder', os.path.join(openpose_root, 'models')
+        '--model_folder', model_folder
     ])
     click.echo('==> Done.')
 
@@ -60,25 +65,28 @@ def detect(video):
     click.echo('Converting video back to MP4...')
     subprocess.run([
         'ffmpeg',
-        '-i', os.path.join('.', 'data', 'detect', 'output', base_name.format('avi')),
-        os.path.join('.', 'data', 'detect', 'output', base_name.format('mp4'))
+        '-i', os.path.join(cfg.detect_output, base_name.format('avi')),
+        os.path.join(cfg.detect_output, base_name.format('mp4'))
     ])
     click.echo('==> Done.')
+
+    return None
 
 
 @cli.command()
 @click.option('--count', default=-1, help='Number of frames to extract.')
 def extract(video, count):
-    """Extract frames from video."""
-    safe_mkdir('data/extract/poses')
-    safe_mkdir('data/extract/original')
+    """Extract frames from original video and pose detected video."""
+    safe_mkdir(cfg.extract_poses)
+    safe_mkdir(cfg.extract_original)
 
     # Extract frames from pose video
-    base_name = get_base_name(video) 
-    cap = cv2.VideoCapture(os.path.join('data', 'detect', 'output', base_name.format('mp4')))
+    base_name = get_base_name(video)
+    pose_video = os.path.join(cfg.detect_output, base_name.format('mp4'))
+    cap = cv2.VideoCapture(pose_video)
     num_frames = count if count > 0 else int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    click.echo(f'Extracting {num_frames} frames from pose video...')
 
+    click.echo(f'Extracting {num_frames} frames from pose video...')
     processed = 0
     while (True):
         if processed >= num_frames:
@@ -88,7 +96,9 @@ def extract(video, count):
         ret, frame = cap.read()
 
         # Save resulting frame
-        cv2.imwrite(f'data/extract/poses/{str(processed).zfill(10)}.jpg', frame)
+        save_path = os.join(cfg.extract_poses,
+                            str(processed).zfill(10) + '.jpg')
+        cv2.imwrite(save_path, frame)
         processed += 1
 
     click.echo('==> Done.')
@@ -96,8 +106,8 @@ def extract(video, count):
     # Extract frames from original video
     cap = cv2.VideoCapture(video)
     num_frames = count if count > 0 else int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    click.echo(f'Extracting {num_frames} frames from original video...')
 
+    click.echo(f'Extracting {num_frames} frames from original video...')
     processed = 0
     while (True):
         if processed >= num_frames:
@@ -107,89 +117,100 @@ def extract(video, count):
         ret, frame = cap.read()
 
         # Save resulting frame
-        cv2.imwrite(f'data/extract/original/{str(processed).zfill(10)}.jpg', frame)
+        save_path = os.join(cfg.extract_original,
+                            str(processed).zfill(10) + '.jpg')
+        cv2.imwrite(save_path, frame)
         processed += 1
-
     click.echo('==> Done.')
+
+    return None
 
 
 @cli.command()
 def resize():
     """Resize images for input to model."""
-    safe_mkdir('data/resize/poses')
-    safe_mkdir('data/resize/original')
+    safe_mkdir(cfg.resize_poses)
+    safe_mkdir(cfg.resize_original)
+
+    def resize_all(path):
+        for filename in os.listdir(path):
+            img = cv2.imread(os.path.join(path, filename))
+            if img is not None:
+                img = cv2.resize(img, (1024, 512))
+                cv2.imwrite(os.path.join(path, filename), img)
+
+        return None
 
     click.echo('Resizing images...')
-    # Resize originals
-    for filename in os.listdir('data/extract/original'):
-        img = cv2.imread(os.path.join('data/extract/original', filename))
-        if img is not None:
-            img = cv2.resize(img, (1024, 512))
-            cv2.imwrite(os.path.join('data/resize/original', filename), img)
-
-    # Resize pose images
-    for filename in os.listdir('data/extract/poses'):
-        img = cv2.imread(os.path.join('data/extract/poses', filename))
-        if img is not None:
-            img = cv2.resize(img, (1024, 512))
-            cv2.imwrite(os.path.join('data/resize/poses', filename), img)
-
+    resize_all(cfg.extract_original)
+    resize_all(cfg.extract_poses)
     click.echo('==> Done.')
+
+    return None
 
 
 @cli.command()
 def transfer():
     """Transfer motion to Spiderman."""
     click.echo('Copying images to pix2pixHD server...')
-    iam_key = os.environ['IAM_KEY']
-    pix2pixhd_root = os.environ['PIX2PIXHD_ROOT']
-    pix2pixhd_dns = os.environ['PIX2PIXHD_DNS']
     subprocess.run([
         'scp',
-        '-i', iam_key,
+        '-i', cfg.iam_key,
         '-r',
         'data/resize/poses/.',
-        pix2pixhd_dns + ':' + os.path.join(pix2pixhd_root, 'datasets', 'spidey', 'test_A')
+        cfg.pix2pixhd_dns + ':' + os.path.join(cfg.pix2pixhd_root,
+                                               'datasets', 'spidey', 'test_A')
     ])
     click.echo('==> Done.')
 
     click.echo('Rendering Spiderman...')
-    subprocess.run(f'ssh -i {iam_key} {pix2pixhd_dns} "cd {pix2pixhd_root};./scripts/test_spidey.sh"', shell=True)
+    subprocess.run(
+        f'ssh -i {cfg.iam_key} {cfg.pix2pixhd_dns} "cd {cfg.pix2pixhd_root};'
+        f'./scripts/test_spidey.sh"',
+        shell=True)
     click.echo('==> Done.')
 
     click.echo('Moving images back...')
-    safe_mkdir('data/transfer')
+    safe_mkdir(cfg.transfer_output)
+    synthesized_imgs = os.path.join(cfg.pix2pixhd_root, 'results', 'spidey',
+                                    'test_latest', 'images', '*synth*')
     subprocess.run([
         'scp',
-        '-i', iam_key,
+        '-i', cfg.iam_key,
         '-r',
-        pix2pixhd_dns + ':' + os.path.join(pix2pixhd_root, 'results', 'spidey', 'test_latest', 'images', '*synth*'),
-        'data/transfer'
+        cfg.pix2pixhd_dns + ':' + synthesized_imgs,
+        cfg.transfer_output
     ])
     click.echo('==> Done.')
+
+    return None
 
 
 @cli.command()
 def rename():
     """Rename synthesized images produced by pix2pixHD."""
     click.echo('Renaming images in ./data/transfer...')
-    for filename in os.listdir('./data/transfer'):
+    for filename in os.listdir(cfg.transfer_output):
         if filename.endswith('jpg'):
-            os.rename('./data/transfer/' + filename, './data/transfer/' + filename[:10] + '.jpg')
-    click.echo('Done.') 
+            os.rename(cfg.transfer_output + filename,
+                      cfg.transfer_output + filename[:10] + '.jpg')
+    click.echo('Done.')
+
+    return None
 
 
 @cli.command()
 def combine():
     """Combine original and synthesized images."""
-    click.echo('Combining images in ./data/resize/original with images in ./data/transfer...')
+    click.echo(f'Combining images in {cfg.original_resized} with images in '
+               f'{cfg.transfer}...')
     safe_mkdir('data/combine')
-    for filename in os.listdir('./data/resize/original'):
+    for filename in os.listdir(cfg.resize_original):
         # load image
-        img = cv2.imread(os.path.join('./data/resize/original', filename))
+        img = cv2.imread(os.path.join(cfg.resize_original, filename))
 
         # find sibling
-        sibling_path = os.path.join('./data/transfer', filename)
+        sibling_path = os.path.join(cfg.transfer_output, filename)
         if os.path.exists(sibling_path):
             sibling = cv2.imread(sibling_path)
 
@@ -197,27 +218,47 @@ def combine():
             combined = np.concatenate([img, sibling], axis=1)
 
             # save
-            combined_path = os.path.join('./data/combine', filename)
+            combined_path = os.path.join(cfg.combine_output, filename)
             cv2.imwrite(combined_path, combined)
 
+    return None
 
 @cli.command()
 def gif(name):
     """Make gif from folder of images."""
     click.echo('Creating gif...')
     subprocess.run([
-        'convert', '-delay', '3', 'data/combine/*.jpg', name.format('gif')
+        'convert', '-delay', '3', cfg.combine_output + '/*.jpg',
+        name.format('gif')
     ])
     click.echo('==> Done.')
+    return None
 
 
 @cli.command()
 def cleanup():
     """Remove intermediate data files."""
-    shutil.rmtree('./data')  # remove local data folder
+    # Local files
+    data_dirs = [
+        cfg.detect_input,
+        cfg.detect_output,
+        cfg.extract_poses,
+        cfg.extract_original,
+        cfg.resize_poses,
+        cfg.resize_original,
+        cfg.transfer_output,
+        cfg.combine_output
+    ]
+    for dir in data_dirs:
+        shutil.rmtree(dir)
+
+    # Files on pix2pixHD node
     subprocess.run(
-        f'ssh -i {iam_key} {pix2pixhd_dns} "cd {pix2pixhd_root};rm -r results/spidey"', 
+        f'ssh -i {cfg.iam_key} {cfg.pix2pixhd_dns} "cd {cfg.pix2pixhd_root};'
+        f'rm -r results/spidey"',
         shell=True)
+
+    return None
 
 
 @cli.command()
@@ -268,6 +309,8 @@ def run(ctx, video):
     # Time profiling
     for k, v in times.items():
         click.echo(f'==> {k} time: {v:.1f}s')
+
+    return None
 
 
 if __name__ == '__main__':
