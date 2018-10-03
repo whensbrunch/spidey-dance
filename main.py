@@ -96,7 +96,7 @@ def extract(video, count):
         ret, frame = cap.read()
 
         # Save resulting frame
-        save_path = os.join(cfg.extract_poses,
+        save_path = os.path.join(cfg.extract_poses,
                             str(processed).zfill(10) + '.jpg')
         cv2.imwrite(save_path, frame)
         processed += 1
@@ -117,7 +117,7 @@ def extract(video, count):
         ret, frame = cap.read()
 
         # Save resulting frame
-        save_path = os.join(cfg.extract_original,
+        save_path = os.path.join(cfg.extract_original,
                             str(processed).zfill(10) + '.jpg')
         cv2.imwrite(save_path, frame)
         processed += 1
@@ -132,18 +132,18 @@ def resize():
     safe_mkdir(cfg.resize_poses)
     safe_mkdir(cfg.resize_original)
 
-    def resize_all(path):
-        for filename in os.listdir(path):
-            img = cv2.imread(os.path.join(path, filename))
+    def resize_all(input_path, output_path):
+        for filename in os.listdir(input_path):
+            img = cv2.imread(os.path.join(input_path, filename))
             if img is not None:
                 img = cv2.resize(img, (1024, 512))
-                cv2.imwrite(os.path.join(path, filename), img)
+                cv2.imwrite(os.path.join(output_path, filename), img)
 
         return None
 
     click.echo('Resizing images...')
-    resize_all(cfg.extract_original)
-    resize_all(cfg.extract_poses)
+    resize_all(cfg.extract_original, cfg.resize_original)
+    resize_all(cfg.extract_poses, cfg.resize_poses)
     click.echo('==> Done.')
 
     return None
@@ -189,11 +189,13 @@ def transfer():
 @cli.command()
 def rename():
     """Rename synthesized images produced by pix2pixHD."""
-    click.echo('Renaming images in ./data/transfer...')
+    click.echo(f'Renaming images in {cfg.transfer_output}...')
     for filename in os.listdir(cfg.transfer_output):
         if filename.endswith('jpg'):
-            os.rename(cfg.transfer_output + filename,
-                      cfg.transfer_output + filename[:10] + '.jpg')
+            os.rename(
+                os.path.join(cfg.transfer_output, filename),
+                os.path.join(cfg.transfer_output, filename[:10] + '.jpg')
+            )
     click.echo('Done.')
 
     return None
@@ -202,9 +204,9 @@ def rename():
 @cli.command()
 def combine():
     """Combine original and synthesized images."""
-    click.echo(f'Combining images in {cfg.original_resized} with images in '
-               f'{cfg.transfer}...')
-    safe_mkdir('data/combine')
+    click.echo(f'Combining images in {cfg.resize_original} with images in '
+               f'{cfg.transfer_output}...')
+    safe_mkdir(cfg.combine_output)
     for filename in os.listdir(cfg.resize_original):
         # load image
         img = cv2.imread(os.path.join(cfg.resize_original, filename))
