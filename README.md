@@ -46,6 +46,17 @@ You'll also need the `.pem` file to `ssh` into the pix2pixHD node. Set the path 
 
 ## Getting help
 
+For help with the command line tool, you can run 
+
+```
+python main.py --help
+```
+
+to learn more about each of the commands.
+
+<p align="center"><img width=60% src="https://github.com/whensbrunch/spidey-dance/blob/master/media/help-example.png"></p>
+
+For further help, please post an issue and I'll get back to you as soon as possible.
 
 
 ## Future Directions
