@@ -13,7 +13,7 @@
 
 ## Basic Overview
 
-Using this command line tool, you can transfer movement from a source video onto an avatar of Spiderman. The pipeline is powered by deep learning models (specifically: generative adversial networks) in order to produce gifs of Spiderman in various poses. This work is based on the research paper "Everybody Dance Now".
+Using this command line tool, you can transfer movement from a source video onto an avatar of Spiderman. The pipeline is powered by deep learning models (specifically: generative adversial networks) in order to produce gifs of Spiderman in various poses. This work is based on the research paper "Everybody Dance Now" and would not be possible without the authors of pix2pixHD and OpenPose.
 
 ## Requirements
 
