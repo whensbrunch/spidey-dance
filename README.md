@@ -56,6 +56,7 @@ python main.py run --video path/to/video
 
 The resulting gif will be saved in the root directory under the same name as the original video. Enjoy!
 
+<p align="center"><img width=60% src="https://github.com/whensbrunch/spidey-dance/blob/master/media/ellen-example.gif"></p>
 
 
 ## Getting help
