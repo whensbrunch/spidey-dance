@@ -19,9 +19,11 @@ Using this command line tool, you can transfer movement from a source video onto
 
 This tool requires:
 
-* 2 AWS EC2 instances (with a GPU)
-* pix2pixHD
-* OpenPose
+* 2 AWS EC2 instances (each with a GPU):
+   * 1 with pix2pixHD
+   * 1 with OpenPose
+   
+For your convenience, I've provided two AMIs with these environments already set up. The OpenPose environment is available on AMI ID ami-06e5de018251b3be2 and the pix2pixHD environment is available on AMI ID ami-035b3ab911ba39d81.
 
 ## Usage
 
@@ -43,6 +45,18 @@ export PIX2PIXHD_ROOT=path/to/pix2pixHD
 We will need two nodes: one to run OpenPose and one to run pix2pixHD. The CLI will run from the OpenPose node and so we will need to `ssh` into the node with pix2pixHD. For this we need the User and Public DNS (ex: ubuntu@ec2-xx-xxx-xxx-xxx.compute-1.amazonaws.com).
 
 You'll also need the `.pem` file to `ssh` into the pix2pixHD node. Set the path to this file as `IAM_KEY`.
+
+If you're using the pre-configured AMIs, then navigate to the root directory of `spidey-dance` and run `git pull` to make sure you have the latest changes.
+
+Upload your source video to the OpenPose instance and run the tool using
+
+```
+python main.py run --video path/to/video
+```
+
+The resulting gif will be saved in the root directory under the same name as the original video. Enjoy!
+
+
 
 ## Getting help
 
