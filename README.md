@@ -47,3 +47,17 @@ You'll also need the `.pem` file to `ssh` into the pix2pixHD node. Set the path 
 ## Getting help
 
 
+
+## Future Directions
+
+These are the directions I'd like to see explored in the future - if you'd like to implement any of these or have your own ideas, feel free to submit a pull request!
+
+1. Face-specific GAN: facial realism is lacking in the current implementation. The authors of "Everybody Dance Now" use a separate GAN for the face to improve quality.
+
+2. Image augmentation: Current training data consisted of ~30s of Spiderman video. Other researchers have had success with ~20min of natural movements. I imagine it will be difficult to procure additional Spiderman footage, so is there a way we can augment the images we have to increase the diversity of the training data?
+
+3. Condition of the previous image: Use information from the previous frame to predict the next frame.
+
+4. Global pose normalization: Another innovation by the author's of "Everybody Dance Now". Currently, Spiderman assumes the proportions of the source actor. We should scale the pose keypoints to return Spiderman to his original proportions.
+
+
