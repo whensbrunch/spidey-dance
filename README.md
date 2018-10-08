@@ -56,7 +56,7 @@ python main.py run --video path/to/video
 
 The resulting gif will be saved in the root directory under the same name as the original video. Enjoy!
 
-![example](media/ellen-example.gif)
+![example](media/ellen.gif)
 
 
 ## Getting help
